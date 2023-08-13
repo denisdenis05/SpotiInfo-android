@@ -19,17 +19,29 @@
         app:layout_constraintVertical_bias="0.278" />
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/authorize_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="158dp"
         android:layout_marginEnd="159dp"
         android:layout_marginBottom="424dp"
         android:text="Button"
-        android:onClick="Buton1Click"
+        android:onClick="SpotiAuth"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text1" />
-
+    <Button
+        android:id="@+id/logout_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="158dp"
+        android:layout_marginEnd="159dp"
+        android:layout_marginBottom="424dp"
+        android:text="Button"
+        android:onClick="SpotiLogOff"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text1" />
 </androidx.constraintlayout.widget.ConstraintLayout>
