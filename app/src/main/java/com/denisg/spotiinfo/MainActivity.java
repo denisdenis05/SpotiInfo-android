@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -52,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String CLIENT_ID = "cda313e2c22d41fca0fd9d6a5d918190";
     private static final String CLIENT_SECRET = "7535b2784fe34a0ebce5764a770bc5a2";
     private static final String REDIRECT_URI = "spotiinfo://callback";
-    private boolean logged;
+    private boolean logged,loaded;
     private String accessToken = "none";
 
     @Override
@@ -92,10 +93,15 @@ public class MainActivity extends AppCompatActivity {
 
                 if (currentTimeMillis < expirationTimeMillis) {
                     // Token is valid
-                    Button logoff = findViewById(R.id.logout_button);
-                    logoff.setText("Log Out");
-                    Button auth = findViewById(R.id.authorize_button);
+                    Log.e("test","STARTED");
+                    LinearLayout auth = findViewById(R.id.authpanel);
+                    LinearLayout logoff = findViewById(R.id.mainpanel);
+                    logoff.setVisibility(View.GONE);
                     auth.setVisibility(View.GONE);
+                    new TopArtistsTask().execute();
+                    new startloading().execute();
+                    Log.e("test","FINISHED");
+
                     logged = true;
                 }
                 else {
@@ -125,11 +131,45 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         } else {
-            Button auth = findViewById(R.id.authorize_button);
-            auth.setText("Login with Spotify");
-            Button logoff = findViewById(R.id.logout_button);
+            LinearLayout logoff = findViewById(R.id.mainpanel);
+            FrameLayout loading = findViewById(R.id.loadingpanel);
             logoff.setVisibility(View.GONE);
+            loading.setVisibility(View.GONE);
             logged = false;
+        }
+    }
+
+    public class startloading extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Log.e("test","STARTED2");
+
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            Log.e("test","DOINBACKGROUNDSTARTED2");
+
+            while(loaded==false) {
+                try {
+                    Thread.sleep(200); // Sleep for 200 milliseconds (0.2 seconds)
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+                return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            FrameLayout loading = findViewById(R.id.loadingpanel);
+            LinearLayout logoff = findViewById(R.id.mainpanel);
+            logoff.setVisibility(View.VISIBLE);
+            loading.setVisibility(View.GONE);
         }
     }
 
@@ -172,7 +212,15 @@ public class MainActivity extends AppCompatActivity {
     private class TopArtistsTask extends AsyncTask<Void, Void, List<Artist>> {
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Log.e("test","STARTED3");
+
+        }
+        @Override
         protected List<Artist> doInBackground(Void... voids) {
+            Log.e("test","DOINBACKGROUNDSTARTED2");
+
             SpotifyApi spotifyApi = new SpotifyApi.Builder()
                     .setAccessToken(accessToken)
                     .build();
@@ -243,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
                     artistLayout.addView(artistName);
 
                     scrollViewContent.addView(artistLayout);
-
+                    loaded=true;
                 }
             } else {
                 System.out.println("Error fetching top artists");
