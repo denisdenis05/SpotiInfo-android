@@ -73,8 +73,7 @@ public class AuthorizationActivity extends AppCompatActivity {
                     String refreshToken = credentials.getRefreshToken();
                     int expiresIn = credentials.getExpiresIn();
 
-                    saveTokenDetailsToFile(accessToken, refreshToken, expiresIn);
-
+                    TokenManager.saveTokenDetailsToFile(getApplicationContext(),accessToken, refreshToken, expiresIn);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -82,24 +81,7 @@ public class AuthorizationActivity extends AppCompatActivity {
                 return null;
             }
 
-            private void saveTokenDetailsToFile(String accessToken, String refreshToken, int expiresIn) {
-                try {
-                    File persistentDir = getApplicationContext().getFilesDir();
 
-                    File tokenFile = new File(persistentDir, "token_details.json");
-
-                    JSONObject tokenDetails = new JSONObject();
-                    tokenDetails.put("access_token", accessToken);
-                    tokenDetails.put("refresh_token", refreshToken);
-                    tokenDetails.put("expires_in", expiresIn);
-
-                    FileWriter writer = new FileWriter(tokenFile);
-                    writer.write(tokenDetails.toString());
-                    writer.close();
-                } catch (IOException | JSONException e) {
-                    e.printStackTrace();
-                }
-            }
         }
 
 
