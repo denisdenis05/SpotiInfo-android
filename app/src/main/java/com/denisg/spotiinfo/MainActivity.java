@@ -2,6 +2,8 @@ package com.denisg.spotiinfo;
 
 import com.squareup.picasso.Picasso;
 
+import com.denisg.spotiinfo.ApiConfig;
+
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
@@ -50,9 +52,9 @@ import se.michaelthelin.spotify.requests.data.personalization.simplified.GetUser
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String CLIENT_ID = "cda313e2c22d41fca0fd9d6a5d918190";
-    private static final String CLIENT_SECRET = "7535b2784fe34a0ebce5764a770bc5a2";
-    private static final String REDIRECT_URI = "spotiinfo://callback";
+    private static final String CLIENT_ID = ApiConfig.CLIENT_ID;
+    private static final String CLIENT_SECRET = ApiConfig.CLIENT_SECRET;
+    private static final String REDIRECT_URI = ApiConfig.REDIRECT_URI;
     private boolean logged;
     boolean[] Loaded = new boolean[2];
     private String accessToken = "none";

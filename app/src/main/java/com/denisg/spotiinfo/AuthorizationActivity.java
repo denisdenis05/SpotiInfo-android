@@ -27,9 +27,9 @@ import se.michaelthelin.spotify.requests.authorization.authorization_code.Author
 
 public class AuthorizationActivity extends AppCompatActivity {
 
-    private static final String CLIENT_ID = "cda313e2c22d41fca0fd9d6a5d918190";
-    private static final String CLIENT_SECRET = "7535b2784fe34a0ebce5764a770bc5a2";
-    private static final String REDIRECT_URI = "spotiinfo://callback";
+    private static final String CLIENT_ID = ApiConfig.CLIENT_ID;
+    private static final String CLIENT_SECRET = ApiConfig.CLIENT_SECRET;
+    private static final String REDIRECT_URI = ApiConfig.REDIRECT_URI;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +37,7 @@ public class AuthorizationActivity extends AppCompatActivity {
 
         Uri callbackUri = getIntent().getData();
 
-        if (callbackUri != null && "spotiinfo".equals(callbackUri.getScheme()) && !(String.valueOf(callbackUri).equals("spotiinfo://callback/?error=access_denied"))) {
+        if (callbackUri != null && "spotiinfo".equals(callbackUri.getScheme()) && !(String.valueOf(callbackUri).equals(REDIRECT_URI+"/?error=access_denied"))) {
             String authorizationCode = callbackUri.getQueryParameter("code");
             Log.e("YourTag", authorizationCode);
 
