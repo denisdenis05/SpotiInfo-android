@@ -1,6 +1,5 @@
 package com.denisg.spotiinfo;
 
-import com.denisg.spotiinfo.TokenManager;
 import com.squareup.picasso.Picasso;
 
 
@@ -8,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -16,12 +16,10 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.apache.hc.core5.http.ParseException;
@@ -40,6 +38,8 @@ import java.util.List;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
+import se.michaelthelin.spotify.model_objects.specification.Album;
+import se.michaelthelin.spotify.model_objects.specification.AlbumSimplified;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
 import se.michaelthelin.spotify.model_objects.specification.Paging;
 import se.michaelthelin.spotify.model_objects.specification.Track;
@@ -53,8 +53,17 @@ public class MainActivity extends AppCompatActivity {
     private static final String CLIENT_ID = "cda313e2c22d41fca0fd9d6a5d918190";
     private static final String CLIENT_SECRET = "7535b2784fe34a0ebce5764a770bc5a2";
     private static final String REDIRECT_URI = "spotiinfo://callback";
-    private boolean logged,loaded;
+    private boolean logged;
+    boolean[] Loaded = new boolean[2];
     private String accessToken = "none";
+
+    List<Artist> ShortTermArtists = new ArrayList<>(),
+            MediumTermArtists = new ArrayList<>(),
+            LongTermArtists = new ArrayList<>();
+
+    List<Track> ShortTermTracks = new ArrayList<>(),
+            MediumTermTracks = new ArrayList<>(),
+            LongTermTracks = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
                     logoff.setVisibility(View.GONE);
                     auth.setVisibility(View.GONE);
                     new TopArtistsTask().execute();
+                    new TopTracksTask().execute();
                     new startloading().execute();
                     Log.e("test","FINISHED");
 
@@ -131,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         } else {
+            Arrays.fill(Loaded, false);
             LinearLayout logoff = findViewById(R.id.mainpanel);
             FrameLayout loading = findViewById(R.id.loadingpanel);
             logoff.setVisibility(View.GONE);
@@ -153,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
         protected Void doInBackground(Void... voids) {
             Log.e("test","DOINBACKGROUNDSTARTED2");
 
-            while(loaded==false) {
+            while(loaded()==false) {
                 try {
                     Thread.sleep(200); // Sleep for 200 milliseconds (0.2 seconds)
                 } catch (InterruptedException e) {
@@ -161,6 +172,16 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
                 return null;
+        }
+
+        boolean loaded()
+        {
+            for(int i=0; i< Loaded.length;i++)
+            {
+                if(Loaded[i]==false)
+                    return false;
+            }
+            return true;
         }
 
         @Override
@@ -230,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
 
             do {
                 GetUsersTopArtistsRequest getTopArtistsRequest = spotifyApi.getUsersTopArtists()
-                        .time_range("long_term")
+                        .time_range("short_term")
                         .limit(limit)
                         .offset((currentPage - 1) * limit) // Adjust offset based on current page
                         .build();
@@ -251,6 +272,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             } while (true);
 
+            ShortTermArtists.addAll(allArtists);
             System.out.println("Total artists listened to: " + allArtists.size());
             return allArtists;
 
@@ -262,37 +284,44 @@ public class MainActivity extends AppCompatActivity {
                 HorizontalScrollView scrollView = findViewById(R.id.scrollViewArtists);
                 LinearLayout scrollViewContent = findViewById(R.id.scrollViewContentArtists);
 
+                int i=1;
                 for (Artist artist : artists) {
-                    LinearLayout artistLayout = new LinearLayout(MainActivity.this);
-                    artistLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                            0,
-                            LinearLayout.LayoutParams.WRAP_CONTENT,
-                            1));
-                    artistLayout.setOrientation(LinearLayout.VERTICAL);
+                    if (i >= 11)
+                        break;
+                    else {
+                        LinearLayout artistLayout = new LinearLayout(MainActivity.this);
+                        artistLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                                0,
+                                LinearLayout.LayoutParams.WRAP_CONTENT,
+                                1));
+                        artistLayout.setOrientation(LinearLayout.VERTICAL);
 
-                    ImageView artistImage = new ImageView(MainActivity.this);
-                    artistImage.setLayoutParams(new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT, // Set image width to match parent
-                            200));
-                    if (artist.getImages() != null && artist.getImages().length > 0) {
-                        String imageUrl = artist.getImages()[0].getUrl(); // Get the first image URL
-                        // Use a library like Picasso or Glide to load the image into the ImageView
-                        Picasso.get().load(imageUrl).into(artistImage);
+                        ImageView artistImage = new ImageView(MainActivity.this);
+                        artistImage.setLayoutParams(new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT, // Set image width to match parent
+                                200));
+                        if (artist.getImages() != null && artist.getImages().length > 0) {
+                            String imageUrl = artist.getImages()[0].getUrl(); // Get the first image URL
+                            // Use a library like Picasso or Glide to load the image into the ImageView
+                            Picasso.get().load(imageUrl).into(artistImage);
+                        }
+
+                        TextView artistName = new TextView(MainActivity.this);
+                        artistName.setLayoutParams(new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT, // Set width to match parent
+                                LinearLayout.LayoutParams.WRAP_CONTENT));
+                        artistName.setText("\n" + String.valueOf(i) + "." + artist.getName());
+                        artistName.setGravity(Gravity.CENTER);
+                        artistName.setTextColor(Color.WHITE);
+                        artistLayout.addView(artistImage);
+                        artistLayout.addView(artistName);
+
+                        i = i + 1;
+                        scrollViewContent.addView(artistLayout);
                     }
-
-                    TextView artistName = new TextView(MainActivity.this);
-                    artistName.setLayoutParams(new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT, // Set width to match parent
-                            LinearLayout.LayoutParams.WRAP_CONTENT));
-                    artistName.setText(artist.getName());
-                    artistName.setGravity(Gravity.CENTER);
-
-                    artistLayout.addView(artistImage);
-                    artistLayout.addView(artistName);
-
-                    scrollViewContent.addView(artistLayout);
-                    loaded=true;
                 }
+
+                Loaded[0]=true;
             } else {
                 System.out.println("Error fetching top artists");
             }
@@ -308,12 +337,13 @@ public class MainActivity extends AppCompatActivity {
 
             GetUsersTopTracksRequest getTopTracksRequest = spotifyApi.getUsersTopTracks()
                     .time_range("short_term") // You can change the time range
-                    .limit(10) // You can change the number of tracks
+                    .limit(50) // You can change the number of tracks
                     .build();
 
             try {
                 Paging<Track> trackPaging = getTopTracksRequest.execute();
                 List<Track> tracks = Arrays.asList(trackPaging.getItems());
+                ShortTermTracks.addAll(tracks);
                 return tracks;
             } catch (SpotifyWebApiException | IOException | ParseException e) {
                 e.printStackTrace();
@@ -321,14 +351,53 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+
         @Override
         protected void onPostExecute(List<Track> tracks) {
             if (tracks != null) {
+                HorizontalScrollView scrollView = findViewById(R.id.scrollViewTracks);
+                LinearLayout scrollViewContent = findViewById(R.id.scrollViewContentTracks);
+
+                int i = 1;
                 for (Track track : tracks) {
-                    System.out.println("Track Name: " + track.getName());
+                    if (i >= 11)
+                        break;
+                    else {
+                        LinearLayout artistLayout = new LinearLayout(MainActivity.this);
+                        artistLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                                0,
+                                LinearLayout.LayoutParams.WRAP_CONTENT,
+                                1));
+                        artistLayout.setOrientation(LinearLayout.VERTICAL);
+
+                        ImageView artistImage = new ImageView(MainActivity.this);
+                        artistImage.setLayoutParams(new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT, // Set image width to match parent
+                                200));
+                        AlbumSimplified album = track.getAlbum();
+                        if (album.getImages() != null && album.getImages().length > 0) {
+                            String imageUrl = album.getImages()[0].getUrl(); // Get the first image URL
+                            // Use a library like Picasso or Glide to load the image into the ImageView
+                            Picasso.get().load(imageUrl).into(artistImage);
+                        }
+
+                        TextView artistName = new TextView(MainActivity.this);
+                        artistName.setLayoutParams(new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT, // Set width to match parent
+                                LinearLayout.LayoutParams.WRAP_CONTENT));
+                        artistName.setText("\n" + String.valueOf(i) + "." + track.getName());
+                        artistName.setGravity(Gravity.CENTER);
+                        artistName.setTextColor(Color.WHITE);
+                        artistLayout.addView(artistImage);
+                        artistLayout.addView(artistName);
+
+                        i = i + 1;
+                        scrollViewContent.addView(artistLayout);
+                    }
                 }
+                Loaded[1] = true;
             } else {
-                System.out.println("Error fetching top tracks");
+                System.out.println("Error fetching top artists");
             }
         }
     }
