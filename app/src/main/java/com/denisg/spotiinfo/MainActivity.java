@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean logged;
     boolean[] Loaded = new boolean[2];
     private String accessToken = "none";
-    int control=0;
+    int control=0; //temp
 
     List<Artist> ShortTermArtists = new ArrayList<>(),
             MediumTermArtists = new ArrayList<>(),
