@@ -2,8 +2,6 @@ package com.denisg.spotiinfo;
 
 import com.squareup.picasso.Picasso;
 
-import com.denisg.spotiinfo.ApiConfig;
-
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
@@ -40,7 +38,6 @@ import java.util.List;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
-import se.michaelthelin.spotify.model_objects.specification.Album;
 import se.michaelthelin.spotify.model_objects.specification.AlbumSimplified;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
 import se.michaelthelin.spotify.model_objects.specification.Paging;
@@ -56,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String CLIENT_SECRET = ApiConfig.CLIENT_SECRET;
     private static final String REDIRECT_URI = ApiConfig.REDIRECT_URI;
     private boolean logged;
-    boolean[] Loaded = new boolean[2];
+    boolean[] Loaded = new boolean[4];
     private String accessToken = "none";
     private int control=1;
 
@@ -110,8 +107,11 @@ public class MainActivity extends AppCompatActivity {
                     LinearLayout logoff = findViewById(R.id.mainpanel);
                     logoff.setVisibility(View.GONE);
                     auth.setVisibility(View.GONE);
-                    new TopArtistsTask().execute();
-                    new TopTracksTask().execute();
+
+                    new LoadTop().execute();
+                    new MainPageTop().execute();
+                    //new TopArtistsTask().execute();
+                    //new TopTracksTask().execute();
                     new startloading().execute();
                     Log.e("test","FINISHED");
 
@@ -224,16 +224,79 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 
-    public void TopArtists(View view)
-    {
-        new TopArtistsTask().execute();
-    }
-    public void TopTracks(View view)
-    {
-        new TopTracksTask().execute();
+    private class LoadTop extends AsyncTask<Void, Void, Void> {
+
+
+        void loadTracks(String term)
+        {
+            SpotifyApi spotifyApi = new SpotifyApi.Builder()
+                    .setAccessToken(accessToken)
+                    .build();
+
+            GetUsersTopTracksRequest getTopTracksRequest = spotifyApi.getUsersTopTracks()
+                    .time_range(term)
+                    .limit(50)
+                    .build();
+
+            try {
+                Paging<Track> trackPaging = getTopTracksRequest.execute();
+                List<Track> tracks = Arrays.asList(trackPaging.getItems());
+                System.out.println("Total " + term + " tracks listened to: " + tracks.size());
+                if(term.equals("short_term"))
+                    ShortTermTracks.addAll(tracks);
+                else if(term.equals("medium_term"))
+                    MediumTermTracks.addAll(tracks);
+                else if(term.equals("long_term"))
+                    LongTermTracks.addAll(tracks);
+            } catch (SpotifyWebApiException | IOException | ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        void loadArtists(String term)
+        {
+            SpotifyApi spotifyApi = new SpotifyApi.Builder()
+                    .setAccessToken(accessToken)
+                    .build();
+
+            GetUsersTopArtistsRequest getTopArtistsRequest = spotifyApi.getUsersTopArtists()
+                    .time_range(term)
+                    .limit(50)
+                    .build();
+
+            try {
+                Paging<Artist> trackPaging = getTopArtistsRequest.execute();
+                List<Artist> artists = Arrays.asList(trackPaging.getItems());
+                System.out.println("Total " + term + " artists listened to: " + artists.size());
+                if(term.equals("short_term"))
+                    ShortTermArtists.addAll(artists);
+                else if(term.equals("medium_term"))
+                    MediumTermArtists.addAll(artists);
+                else if(term.equals("long_term"))
+                    LongTermArtists.addAll(artists);
+            } catch (SpotifyWebApiException | IOException | ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        protected Void doInBackground(Void... voids) {
+            Log.e("test","DOINBACKGROUNDSTARTED2");
+            loadArtists("short_term");
+            loadArtists("medium_term");
+            loadArtists("long_term");
+            loadTracks("short_term");
+            loadTracks("medium_term");
+            loadTracks("long_term");
+
+            Loaded[0]=true;
+            Loaded[1]=true;
+            return null;
+        }
     }
 
-    private class TopArtistsTask extends AsyncTask<Void, Void, List<Artist>> {
+
+
+    private class MainPageTop extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected void onPreExecute() {
@@ -242,53 +305,28 @@ public class MainActivity extends AppCompatActivity {
 
         }
         @Override
-        protected List<Artist> doInBackground(Void... voids) {
-            Log.e("test","DOINBACKGROUNDSTARTED2");
-
-            SpotifyApi spotifyApi = new SpotifyApi.Builder()
-                    .setAccessToken(accessToken)
-                    .build();
-            int limit = 50; // Start with a reasonable limit
-            int currentPage = 1;
-            List<Artist> allArtists = new ArrayList<>();
-
-            do {
-                GetUsersTopArtistsRequest getTopArtistsRequest = spotifyApi.getUsersTopArtists()
-                        .time_range("short_term")
-                        .limit(limit)
-                        .offset((currentPage - 1) * limit) // Adjust offset based on current page
-                        .build();
-
+        protected Void doInBackground(Void... voids) {
+            while(Loaded[0]==false || Loaded[1]==false) {
                 try {
-                    Paging<Artist> artistPaging = getTopArtistsRequest.execute();
-                    List<Artist> artists = Arrays.asList(artistPaging.getItems());
-
-                    if (artists.isEmpty()) {
-                        break; // No more artists to retrieve
-                    }
-
-                    allArtists.addAll(artists);
-                    currentPage++;
-                } catch (SpotifyWebApiException | IOException | ParseException e) {
+                    Thread.sleep(200); // Sleep for 200 milliseconds (0.2 seconds)
+                } catch (InterruptedException e) {
                     e.printStackTrace();
-                    // Continue the loop whatsoever
                 }
-            } while (true);
-
-            ShortTermArtists.addAll(allArtists);
-            System.out.println("Total artists listened to: " + allArtists.size());
-            return allArtists;
-
+            }
+            return null;
         }
 
+
         @Override
-        protected void onPostExecute(List<Artist> artists) {
-            if (artists != null) {
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+
+            if (ShortTermArtists != null) {
                 HorizontalScrollView scrollView = findViewById(R.id.scrollViewArtists);
                 LinearLayout scrollViewContent = findViewById(R.id.scrollViewContentArtists);
 
                 int i=1;
-                for (Artist artist : artists) {
+                for (Artist artist : ShortTermArtists) {
                     if (i >= 11)
                         break;
                     else {
@@ -324,45 +362,18 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
-                Loaded[0]=true;
+                Loaded[2]=true;
             } else {
                 System.out.println("Error fetching top artists");
             }
-        }
-    }
-    private class TopTracksTask extends AsyncTask<Void, Void, List<Track>> {
-
-        @Override
-        protected List<Track> doInBackground(Void... voids) {
-            SpotifyApi spotifyApi = new SpotifyApi.Builder()
-                    .setAccessToken(accessToken)
-                    .build();
-
-            GetUsersTopTracksRequest getTopTracksRequest = spotifyApi.getUsersTopTracks()
-                    .time_range("short_term") // You can change the time range
-                    .limit(50) // You can change the number of tracks
-                    .build();
-
-            try {
-                Paging<Track> trackPaging = getTopTracksRequest.execute();
-                List<Track> tracks = Arrays.asList(trackPaging.getItems());
-                ShortTermTracks.addAll(tracks);
-                return tracks;
-            } catch (SpotifyWebApiException | IOException | ParseException e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
 
 
-        @Override
-        protected void onPostExecute(List<Track> tracks) {
-            if (tracks != null) {
+            if (ShortTermTracks != null) {
                 HorizontalScrollView scrollView = findViewById(R.id.scrollViewTracks);
                 LinearLayout scrollViewContent = findViewById(R.id.scrollViewContentTracks);
 
                 int i = 1;
-                for (Track track : tracks) {
+                for (Track track : ShortTermTracks) {
                     if (i >= 11)
                         break;
                     else {
@@ -398,7 +409,7 @@ public class MainActivity extends AppCompatActivity {
                         scrollViewContent.addView(artistLayout);
                     }
                 }
-                Loaded[1] = true;
+                Loaded[3] = true;
             } else {
                 System.out.println("Error fetching top artists");
             }
