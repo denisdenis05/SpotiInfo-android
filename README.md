@@ -12,5 +12,5 @@ SpotiInfo is a mobile app that shows spotify statistics such as a top of tracks 
 <br><br>
 ![loading](https://imgur.com/enTwRFY.jpeg)
 <br><br>
-![mainpage](https://imgur.com/QybrZZ0.jpeg)
+![mainpage](https://imgur.com/budipvB.jpeg)
 <br><br>

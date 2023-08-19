@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -41,11 +42,20 @@ import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCrede
 import se.michaelthelin.spotify.model_objects.specification.AlbumSimplified;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
 import se.michaelthelin.spotify.model_objects.specification.Paging;
+import se.michaelthelin.spotify.model_objects.specification.PagingCursorbased;
+import se.michaelthelin.spotify.model_objects.specification.PlayHistory;
 import se.michaelthelin.spotify.model_objects.specification.Track;
+import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
 import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeRefreshRequest;
 import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeUriRequest;
 import se.michaelthelin.spotify.requests.data.personalization.simplified.GetUsersTopArtistsRequest;
 import se.michaelthelin.spotify.requests.data.personalization.simplified.GetUsersTopTracksRequest;
+
+
+import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
+import se.michaelthelin.spotify.requests.data.player.GetCurrentUsersRecentlyPlayedTracksRequest;
+import se.michaelthelin.spotify.requests.data.tracks.GetTrackRequest;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -64,6 +74,9 @@ public class MainActivity extends AppCompatActivity {
     List<Track> ShortTermTracks = new ArrayList<>(),
             MediumTermTracks = new ArrayList<>(),
             LongTermTracks = new ArrayList<>();
+
+    PlayHistory[] playHistoryItems= new PlayHistory[0];
+    Track[] trackArray= new Track[0];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -227,6 +240,59 @@ public class MainActivity extends AppCompatActivity {
     private class LoadTop extends AsyncTask<Void, Void, Void> {
 
 
+        void loadRecentTracks(){
+            SpotifyApi spotifyApi = new SpotifyApi.Builder()
+                    .setAccessToken(accessToken)
+                    .build();
+
+            try {
+                // Make a request to get the user's recently played tracks
+                GetCurrentUsersRecentlyPlayedTracksRequest recentlyPlayedTracksRequest = spotifyApi.getCurrentUsersRecentlyPlayedTracks()
+                        .limit(40)
+                        .build();
+
+                PagingCursorbased<PlayHistory> playHistoryPaging = recentlyPlayedTracksRequest.execute();
+                PlayHistory[] localplayHistoryItems = playHistoryPaging.getItems();
+                System.out.println("LENGTH: " + localplayHistoryItems.length);
+
+                playHistoryItems = new PlayHistory[localplayHistoryItems.length];
+                System.arraycopy(localplayHistoryItems, 0, playHistoryItems, 0, localplayHistoryItems.length);
+
+
+                for (PlayHistory playHistory : playHistoryItems) {
+                    System.out.println("Track: " + playHistory.getTrack().getName());
+                    System.out.println("Artist: " + playHistory.getTrack().getArtists()[0].getName());
+                    System.out.println("Played at: " + playHistory.getPlayedAt());
+                    System.out.println();
+                }
+            } catch (SpotifyWebApiException | IOException | ParseException e) {
+                e.printStackTrace();
+            }
+
+            trackArray = new Track[playHistoryItems.length];
+
+
+            for (int i = 0; i < playHistoryItems.length; i++) {
+                PlayHistory playHistory = playHistoryItems[i];
+                TrackSimplified trackSimplified = playHistory.getTrack();
+                String trackId = trackSimplified.getId();
+
+                GetTrackRequest getTrackRequest = spotifyApi.getTrack(trackId).build();
+
+                try {
+                    Track track = getTrackRequest.execute();
+                    trackArray[i] = track;
+                } catch (SpotifyWebApiException | IOException | ParseException e) {
+                    e.printStackTrace();
+                    // Handle the exception appropriately.
+                }
+            }
+
+
+
+
+        }
+
         void loadTracks(String term)
         {
             SpotifyApi spotifyApi = new SpotifyApi.Builder()
@@ -287,7 +353,7 @@ public class MainActivity extends AppCompatActivity {
             loadTracks("short_term");
             loadTracks("medium_term");
             loadTracks("long_term");
-
+            loadRecentTracks();
             Loaded[0]=true;
             Loaded[1]=true;
             return null;
@@ -321,6 +387,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
 
+            //ARTISTS
             if (ShortTermArtists != null) {
                 HorizontalScrollView scrollView = findViewById(R.id.scrollViewArtists);
                 LinearLayout scrollViewContent = findViewById(R.id.scrollViewContentArtists);
@@ -340,11 +407,16 @@ public class MainActivity extends AppCompatActivity {
                         ImageView artistImage = new ImageView(MainActivity.this);
                         artistImage.setLayoutParams(new LinearLayout.LayoutParams(
                                 LinearLayout.LayoutParams.MATCH_PARENT, // Set image width to match parent
-                                200));
+                                300));
                         if (artist.getImages() != null && artist.getImages().length > 0) {
-                            String imageUrl = artist.getImages()[0].getUrl(); // Get the first image URL
-                            // Use a library like Picasso or Glide to load the image into the ImageView
-                            Picasso.get().load(imageUrl).into(artistImage);
+                            String imageUrl = artist.getImages()[0].getUrl();
+
+                            Picasso.get()
+                                    .load(imageUrl)
+                                    .transform(new RoundedCornersTransformation(700, 10))
+                                    .into(artistImage);
+
+
                         }
 
                         TextView artistName = new TextView(MainActivity.this);
@@ -368,6 +440,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
 
+            //TRACKS
             if (ShortTermTracks != null) {
                 HorizontalScrollView scrollView = findViewById(R.id.scrollViewTracks);
                 LinearLayout scrollViewContent = findViewById(R.id.scrollViewContentTracks);
@@ -387,12 +460,16 @@ public class MainActivity extends AppCompatActivity {
                         ImageView artistImage = new ImageView(MainActivity.this);
                         artistImage.setLayoutParams(new LinearLayout.LayoutParams(
                                 LinearLayout.LayoutParams.MATCH_PARENT, // Set image width to match parent
-                                200));
+                                300));
+
                         AlbumSimplified album = track.getAlbum();
                         if (album.getImages() != null && album.getImages().length > 0) {
-                            String imageUrl = album.getImages()[0].getUrl(); // Get the first image URL
-                            // Use a library like Picasso or Glide to load the image into the ImageView
-                            Picasso.get().load(imageUrl).into(artistImage);
+                            String imageUrl = album.getImages()[0].getUrl();
+
+                            Picasso.get()
+                                    .load(imageUrl)
+                                    .transform(new RoundedCornersTransformation(100, 10))
+                                    .into(artistImage);
                         }
 
                         TextView artistName = new TextView(MainActivity.this);
@@ -400,6 +477,8 @@ public class MainActivity extends AppCompatActivity {
                                 LinearLayout.LayoutParams.MATCH_PARENT, // Set width to match parent
                                 LinearLayout.LayoutParams.WRAP_CONTENT));
                         artistName.setText("\n" + String.valueOf(i) + "." + track.getName());
+                        artistName.setMaxLines(2);
+                        artistName.setEllipsize(TextUtils.TruncateAt.END);
                         artistName.setGravity(Gravity.CENTER);
                         artistName.setTextColor(Color.WHITE);
                         artistLayout.addView(artistImage);
@@ -413,6 +492,37 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 System.out.println("Error fetching top artists");
             }
+
+            //RECENT TRACKS
+
+            ImageView lasttrackimg = findViewById(R.id.LastSongImage);
+            TextView lasttracktitle = findViewById(R.id.LastSongTitle);
+            TextView lasttrackartist = findViewById(R.id.LastSongArtist);
+
+            Track lasttrack=trackArray[0];
+            lasttracktitle.setText(lasttrack.getName());
+            lasttrackartist.setText(lasttrack.getArtists()[0].getName());
+
+            AlbumSimplified album = lasttrack.getAlbum();
+            if (album.getImages() != null && album.getImages().length > 0) {
+                String imageUrl = album.getImages()[0].getUrl();
+
+                Picasso.get()
+                        .load(imageUrl)
+                        .transform(new RoundedCornersTransformation(100, 10))
+                        .into(lasttrackimg);
+            }
+
+
+
+
+/*
+System.out.println("Track: " + track.getName());
+                    System.out.println("Artist: " + track.getArtists()[0].getName());
+                    System.out.println("Played at: " + playHistory.getPlayedAt());
+                    System.out.println();
+ */
+
         }
     }
 
@@ -425,7 +535,7 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         AuthorizationCodeUriRequest authorizationCodeUriRequest = spotifyApi.authorizationCodeUri()
-                .scope("user-read-private,user-read-email,user-top-read")
+                .scope("user-read-private,user-read-email,user-top-read,user-read-recently-played")
                 .show_dialog(true)
                 .build();
 
