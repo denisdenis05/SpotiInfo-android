@@ -9,12 +9,76 @@
     tools:context=".MainActivity">
 
 
+    <FrameLayout
+        android:id="@+id/loadingpanel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteY="269dp">
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="241dp"
+            android:layout_height="119dp"
+            android:layout_gravity="center"
+            android:layout_margin="8dp"
+            android:autoSizeTextType="uniform"
+            android:maxLines="2"
+            android:text="Loading your preferences..."
+            android:textAlignment="center"
+            android:textColor="#FFFFFF" />
+
+    </FrameLayout>
+
+    <LinearLayout
+
+        android:id="@+id/tops"
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#280057"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteY="731dp">
+
+
+        <TextView
+            android:id="@+id/TopTextTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="25dp"
+            android:layout_marginTop="35dp"
+            android:layout_marginRight="25dp"
+            android:layout_marginBottom="10dp"
+
+            android:autoSizeTextType="uniform"
+            android:text="Top artists"
+            android:textColor="#d7ff60"
+            android:textSize="24sp" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="504dp"
+            android:layout_margin="25dp"
+            android:background="@drawable/allrounded_light_green">
+
+            <LinearLayout
+                android:id="@+id/TopPanelLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="25dp"
+                android:orientation="vertical" />
+        </ScrollView>
+
+    </LinearLayout>
+
     <LinearLayout
         android:id="@+id/mainpanel"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#1F1F1F"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        tools:layout_editor_absoluteY="1032dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -24,10 +88,11 @@
         </LinearLayout>
 
         <Button
-            android:layout_margin="10dp"
             android:id="@+id/logout_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:autoSizeTextType="uniform"
             android:onClick="SpotiLogOff"
             android:text="LogOut" />
 
@@ -56,6 +121,8 @@
                     android:layout_margin="10dp"
                     android:layout_marginLeft="20dp"
                     android:layout_weight="1"
+                    android:autoSizeTextType="uniform"
+
                     android:text="Top Artists for last month"
                     android:textColor="#FFFFFF" />
 
@@ -64,7 +131,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:autoSizeTextType="uniform"
                     android:background="@android:color/transparent"
+                    android:onClick="MoreTop"
                     android:text="More"
                     android:textColor="#FFFFFF" />
 
@@ -110,6 +179,8 @@
                     android:layout_margin="10dp"
                     android:layout_marginLeft="20dp"
                     android:layout_weight="1"
+                    android:autoSizeTextType="uniform"
+
                     android:text="Top Tracks for last month"
                     android:textColor="#FFFFFF" />
 
@@ -118,8 +189,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:autoSizeTextType="uniform"
                     android:background="@android:color/transparent"
                     android:text="More"
+
                     android:textColor="#FFFFFF" />
 
 
@@ -165,6 +238,7 @@
                     android:layout_margin="10dp"
                     android:layout_marginLeft="30dp"
                     android:layout_weight="1"
+                    android:autoSizeTextType="uniform"
                     android:text="Last played song"
                     android:textColor="#FFFFFF" />
 
@@ -173,8 +247,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:autoSizeTextType="uniform"
                     android:background="@android:color/transparent"
                     android:text="More"
+
                     android:textColor="#FFFFFF" />
             </LinearLayout>
 
@@ -214,6 +290,7 @@
                             android:layout_marginLeft="15dp"
                             android:layout_marginTop="20dp"
                             android:layout_marginBottom="8dp"
+                            android:autoSizeTextType="uniform"
 
                             android:text="TextView"
                             android:textColor="#FFFFFF"
@@ -224,6 +301,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="30dp"
                             android:layout_marginLeft="15dp"
+                            android:autoSizeTextType="uniform"
                             android:text="TextView"
                             android:textColor="#FFFFFF"
                             android:textSize="14sp" />
@@ -245,34 +323,12 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:background="#1D6F3A">
+            android:background="#1D6F3A"
+            android:orientation="vertical">
 
         </LinearLayout>
 
     </LinearLayout>
-
-    <FrameLayout
-        android:id="@+id/loadingpanel"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:layout_editor_absoluteY="269dp">
-
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="241dp"
-            android:layout_height="119dp"
-            android:layout_gravity="center"
-            android:layout_margin="8dp"
-            android:autoSizeTextType="uniform"
-            android:maxLines="2"
-            android:text="Loading your preferences..."
-            android:textAlignment="center"
-            android:textColor="#FFFFFF"
-            app:fontFamily="sans-serif-condensed" />
-
-    </FrameLayout>
 
     <LinearLayout
         android:id="@+id/authpanel"
@@ -302,6 +358,7 @@
             android:layout_marginBottom="669dp"
             android:background="@drawable/ic_loginwspoti"
             android:onClick="SpotiAuth"
+            android:visibility="visible"
             app:backgroundTint="@color/cardview_shadow_end_color"
             app:backgroundTintMode="add"
             app:layout_constraintBottom_toBottomOf="parent"
