@@ -31,6 +31,45 @@
     </FrameLayout>
 
     <LinearLayout
+        android:id="@+id/authpanel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#280057"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="?attr/actionBarDivider" />
+
+        <Button
+            android:id="@+id/authorize_button"
+            android:layout_width="323dp"
+            android:layout_height="62dp"
+            android:layout_marginStart="44dp"
+            android:layout_marginTop="300dp"
+            android:layout_marginEnd="44dp"
+            android:layout_marginRight="44dp"
+            android:layout_marginBottom="669dp"
+            android:background="@drawable/ic_loginwspoti"
+            android:onClick="SpotiAuth"
+            android:visibility="visible"
+            app:backgroundTint="@color/cardview_shadow_end_color"
+            app:backgroundTintMode="add"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout_editor_absoluteX="20dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
 
         android:id="@+id/tops"
 
@@ -41,13 +80,24 @@
         tools:layout_editor_absoluteY="731dp">
 
 
+        <Button
+            android:id="@+id/topbackbutton"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:autoSizeTextType="uniform"
+            android:onClick="MainPanel"
+
+            android:text="back" />
+
         <TextView
             android:id="@+id/TopTextTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginLeft="25dp"
-            android:layout_marginTop="35dp"
+            android:layout_marginTop="5dp"
             android:layout_marginRight="25dp"
             android:layout_marginBottom="10dp"
             android:autoSizeTextType="uniform"
@@ -61,13 +111,15 @@
             android:layout_width="match_parent"
             android:layout_height="474dp"
             android:layout_margin="25dp"
-            android:background="@drawable/allrounded_light_green">
+            android:background="@drawable/allrounded_light_green"
+            android:scrollbars="none">
 
             <LinearLayout
                 android:id="@+id/TopPanelLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="25dp"
+                android:layout_margin="30dp"
+                android:layout_marginBottom="30dp"
                 android:background="@android:color/transparent"
                 android:orientation="vertical" />
         </ScrollView>
@@ -110,10 +162,9 @@
             android:id="@+id/SwitchToButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Switch to tracks"
-            android:onClick="TopButtonsFunction"
             android:layout_margin="15dp"
-            />
+            android:onClick="TopButtonsFunction"
+            android:text="Switch to tracks" />
 
     </LinearLayout>
 
@@ -121,7 +172,7 @@
         android:id="@+id/mainpanel"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#1F1F1F"
+        android:background="#080024"
         android:orientation="vertical"
         tools:layout_editor_absoluteY="725dp">
 
@@ -139,7 +190,8 @@
             android:layout_margin="10dp"
             android:autoSizeTextType="uniform"
             android:onClick="SpotiLogOff"
-            android:text="LogOut" />
+            android:text="LogOut"
+            android:textColor="#d7ff60" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -151,7 +203,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="166dp"
-            android:background="#3D3D3D"
+            android:background="#280057"
             android:orientation="vertical">
 
             <LinearLayout
@@ -169,7 +221,7 @@
                     android:autoSizeTextType="uniform"
 
                     android:text="Top Artists for last month"
-                    android:textColor="#FFFFFF" />
+                    android:textColor="#d7ff60" />
 
                 <Button
                     android:id="@+id/MoreArtistsButton"
@@ -180,7 +232,7 @@
                     android:background="@android:color/transparent"
                     android:onClick="MoreTop"
                     android:text="More"
-                    android:textColor="#FFFFFF" />
+                    android:textColor="#d7ff60" />
 
 
             </LinearLayout>
@@ -188,7 +240,8 @@
             <HorizontalScrollView
                 android:id="@+id/scrollViewArtists"
                 android:layout_width="match_parent"
-                android:layout_height="120dp">
+                android:layout_height="120dp"
+                android:scrollbars="none">
 
                 <LinearLayout
                     android:id="@+id/scrollViewContentArtists"
@@ -200,6 +253,8 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/blanklayout1"
+
             android:layout_width="match_parent"
             android:layout_height="39dp"
             android:orientation="vertical">
@@ -209,7 +264,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="166dp"
-            android:background="#3D3D3D"
+            android:background="#280057"
             android:orientation="vertical">
 
             <LinearLayout
@@ -227,7 +282,7 @@
                     android:autoSizeTextType="uniform"
 
                     android:text="Top Tracks for last month"
-                    android:textColor="#FFFFFF" />
+                    android:textColor="#d7ff60" />
 
                 <Button
                     android:id="@+id/MoreTracksButton"
@@ -239,7 +294,7 @@
                     android:onClick="MoreTop"
                     android:text="More"
 
-                    android:textColor="#FFFFFF" />
+                    android:textColor="#d7ff60" />
 
 
             </LinearLayout>
@@ -247,7 +302,8 @@
             <HorizontalScrollView
                 android:id="@+id/scrollViewTracks"
                 android:layout_width="match_parent"
-                android:layout_height="120dp">
+                android:layout_height="120dp"
+                android:scrollbars="none">
 
                 <LinearLayout
                     android:id="@+id/scrollViewContentTracks"
@@ -259,6 +315,8 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/blanklayout2"
+
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:orientation="vertical">
@@ -294,6 +352,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:autoSizeTextType="uniform"
+                    android:onClick="MoreTracks"
                     android:background="@android:color/transparent"
                     android:text="More"
 
@@ -303,7 +362,8 @@
             <ScrollView
                 android:id="@+id/scrollViewRecentTracks"
                 android:layout_width="match_parent"
-                android:layout_height="120dp">
+                android:layout_height="120dp"
+                android:scrollbars="none">
 
                 <LinearLayout
                     android:id="@+id/scrollViewContentRecentTracks"
@@ -369,7 +429,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#1D6F3A"
+            android:background="#000000"
             android:orientation="vertical">
 
         </LinearLayout>
@@ -377,41 +437,59 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/authpanel"
+
+        android:id="@+id/lasttracks"
+
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#280057"
         android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        tools:layout_editor_absoluteY="731dp">
 
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="?attr/actionBarDivider" />
 
         <Button
-            android:id="@+id/authorize_button"
-            android:layout_width="323dp"
-            android:layout_height="62dp"
-            android:layout_marginStart="44dp"
-            android:layout_marginTop="300dp"
-            android:layout_marginEnd="44dp"
-            android:layout_marginRight="44dp"
-            android:layout_marginBottom="669dp"
-            android:background="@drawable/ic_loginwspoti"
-            android:onClick="SpotiAuth"
-            android:visibility="visible"
-            app:backgroundTint="@color/cardview_shadow_end_color"
-            app:backgroundTintMode="add"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:layout_editor_absoluteX="20dp" />
+            android:id="@+id/lasttracksbackbutton"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="25dp"
+            android:autoSizeTextType="uniform"
+            android:onClick="MainPanel"
+
+            android:text="back" />
+
+        <TextView
+            android:id="@+id/LastTracksTextTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="25dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="25dp"
+            android:layout_marginBottom="10dp"
+            android:autoSizeTextType="uniform"
+
+            android:gravity="center"
+            android:text="Last tracks"
+            android:textColor="#d7ff60"
+            android:textSize="24sp" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="531dp"
+            android:layout_margin="25dp"
+            android:background="@drawable/allrounded_light_green"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/LastTracksPanelLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="30dp"
+                android:layout_marginBottom="30dp"
+                android:background="@android:color/transparent"
+                android:orientation="vertical" />
+        </ScrollView>
 
     </LinearLayout>
 

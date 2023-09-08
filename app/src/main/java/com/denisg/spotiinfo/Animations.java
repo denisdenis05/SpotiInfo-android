@@ -1,6 +1,7 @@
 package com.denisg.spotiinfo;
 
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.BounceInterpolator;
@@ -27,6 +28,8 @@ public class Animations {
 
                 for (View view : viewsToHide) {
                     view.setVisibility(View.GONE);
+                    view.setElevation(-10f);
+                    EnableDisableViews((ViewGroup) view,false);
                 }
 
                 Animation fadeIn = new AlphaAnimation(0.0f, 1.0f);
@@ -34,6 +37,10 @@ public class Animations {
                 fadeIn.setFillAfter(true);
 
                 viewToFadeIn.setVisibility(View.VISIBLE);
+                EnableDisableViews((ViewGroup) viewToFadeIn,true);
+                viewToFadeIn.setElevation(1f);
+
+
                 viewToFadeIn.startAnimation(fadeIn);
             }
 
@@ -50,6 +57,15 @@ public class Animations {
         }
     }
 
+    public static void EnableDisableViews(ViewGroup viewGroup, boolean type) {
+        for (int i = 0; i < viewGroup.getChildCount(); i++) {
+            View child = viewGroup.getChildAt(i);
+            if (child instanceof ViewGroup)
+                EnableDisableViews((ViewGroup) child, type);
+            else
+                child.setEnabled(type);
+        }
+    }
 
     public static void fadeInAndBounce(final View view) {
         view.setVisibility(View.INVISIBLE);

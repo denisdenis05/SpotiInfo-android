@@ -5,6 +5,7 @@ import com.squareup.picasso.Picasso;
 
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.WindowCompat;
 
 import android.content.Intent;
@@ -14,6 +15,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -95,12 +97,33 @@ public class MainActivity extends AppCompatActivity {
         start();
     }
 
+    void init()
+    {
+    //init blank layouts
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        int screenHeight = displayMetrics.heightPixels;
+        int desiredHeight = (int) (0.08 * screenHeight);
+
+
+        LinearLayout existingLinearLayout1 = findViewById(R.id.blanklayout1);
+        LinearLayout.LayoutParams layoutParams1 = (LinearLayout.LayoutParams) existingLinearLayout1.getLayoutParams();
+        layoutParams1.height = desiredHeight;
+
+        existingLinearLayout1.setLayoutParams(layoutParams1);
+
+        LinearLayout existingLinearLayout2 = findViewById(R.id.blanklayout2);
+        LinearLayout.LayoutParams layoutParams2 = (LinearLayout.LayoutParams) existingLinearLayout2.getLayoutParams();
+        layoutParams2.height = desiredHeight;
+
+        existingLinearLayout2.setLayoutParams(layoutParams2);
+    //init blank layouts finish
+    }
+
     private void start() {
         File persistentDir = getApplicationContext().getFilesDir();
         File tokenFile = new File(persistentDir, "token_details.json");
 
-
-
+        init();
 
         if (tokenFile.exists()) {
             try {
@@ -222,9 +245,9 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout auth = findViewById(R.id.authpanel);
         LinearLayout mainpanel = findViewById(R.id.mainpanel);
         LinearLayout tops = findViewById(R.id.tops);
+        LinearLayout lasttracks = findViewById(R.id.lasttracks);
         FrameLayout loading = findViewById(R.id.loadingpanel);
-
-        Animations.FadeInOutViews(view, auth, mainpanel, tops, loading);
+        Animations.FadeInOutViews(view, auth, mainpanel, tops,lasttracks, loading);
     }
 
     private void refreshAccessToken(String refreshToken) {
@@ -468,9 +491,16 @@ public class MainActivity extends AppCompatActivity {
                         artistLayout.setOrientation(LinearLayout.VERTICAL);
 
                         ImageView artistImage = new ImageView(MainActivity.this);
+
+                        float desiredHeightPercentage = 0.10f;
+                        int parentHeight = getResources().getDisplayMetrics().heightPixels;
+                        int desiredHeight = (int) (parentHeight * desiredHeightPercentage);
+                        int desiredWidth=2*desiredHeight;
+
+
                         artistImage.setLayoutParams(new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT, // Set image width to match parent
-                                200));
+                                desiredWidth, // Set image width to match parent
+                                desiredHeight));
                         if (artist.getImages() != null && artist.getImages().length > 0) {
                             String imageUrl = artist.getImages()[0].getUrl();
 
@@ -522,9 +552,16 @@ public class MainActivity extends AppCompatActivity {
                         artistLayout.setOrientation(LinearLayout.VERTICAL);
 
                         ImageView artistImage = new ImageView(MainActivity.this);
+
+                        float desiredHeightPercentage = 0.10f;
+                        int parentHeight = getResources().getDisplayMetrics().heightPixels;
+                        int desiredHeight = (int) (parentHeight * desiredHeightPercentage);
+
+                        int desiredWidth=2*desiredHeight;
+
                         artistImage.setLayoutParams(new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT, // Set image width to match parent
-                                200));
+                                desiredWidth, // Set image width to match parent
+                                desiredHeight));
 
                         AlbumSimplified album = track.getAlbum();
                         if (album.getImages() != null && album.getImages().length > 0) {
@@ -595,11 +632,31 @@ System.out.println("Track: " + track.getName());
 
         if (viewId == R.id.MoreArtistsButton) {
             toptype=1;
+            Button SwitchToButton = findViewById(R.id.SwitchToButton);
+            SwitchToButton.setText("Switch to tracks");
         }
         else if (viewId == R.id.MoreTracksButton) {
             toptype=4;
+            Button SwitchToButton = findViewById(R.id.SwitchToButton);
+            SwitchToButton.setText("Switch to artists");
         }
         new TopPageTop().execute();
+    }
+
+    public void MoreTracks(View view)
+    {
+        int viewId = view.getId();
+
+        if (viewId == R.id.MoreRecentTracksButton)
+            new LastTracksPageTop().execute();
+    }
+
+    public void MainPanel(View view)
+    {
+        LinearLayout mainpanel = findViewById(R.id.mainpanel);
+        LinearLayout scrollViewContent = findViewById(R.id.TopPanelLayout);
+        scrollViewContent.removeAllViews();
+        HideEverythingExcept(mainpanel);
     }
 
     public void TopButtonsFunction(View view) {
@@ -609,9 +666,41 @@ System.out.println("Track: " + track.getName());
 
         if (viewId == R.id.SwitchToButton) {
             if(toptype<4)
+            {
                 toptype=toptype+3;
+                Button SwitchToButton = findViewById(R.id.SwitchToButton);
+                SwitchToButton.setText("Switch to artists");
+            }
             else
+            {
                 toptype=toptype-3;
+                Button SwitchToButton = findViewById(R.id.SwitchToButton);
+                SwitchToButton.setText("Switch to tracks");
+            }
+            if(toptype==1) {
+                TextView TopTextTitle = findViewById(R.id.TopTextTitle);
+                TopTextTitle.setText("Top artists\nlast 4 weeks");
+            }
+            else if(toptype==2) {
+                TextView TopTextTitle = findViewById(R.id.TopTextTitle);
+                TopTextTitle.setText("Top artists\nlast 6 months");
+            }else if(toptype==3) {
+                TextView TopTextTitle = findViewById(R.id.TopTextTitle);
+                TopTextTitle.setText("Top artists\nlifetime");
+            }
+            if(toptype==4) {
+                TextView TopTextTitle = findViewById(R.id.TopTextTitle);
+                TopTextTitle.setText("Top tracks\nlast 4 weeks");
+            }
+            else if(toptype==5) {
+                TextView TopTextTitle = findViewById(R.id.TopTextTitle);
+                TopTextTitle.setText("Top tracks\nlast 6 months");
+            }
+            else if(toptype==6) {
+                TextView TopTextTitle = findViewById(R.id.TopTextTitle);
+                TopTextTitle.setText("Top tracks\nlifetime");
+            }
+
         }
         else if (viewId == R.id.weeksbutton) {
             if(toptype<4)
@@ -674,6 +763,7 @@ System.out.println("Track: " + track.getName());
                     Log.e("test","ARTISTS!!!!!!!");
 
                     LinearLayout scrollViewContent = findViewById(R.id.TopPanelLayout);
+                    scrollViewContent.removeAllViews();
 
                     int i = 1;
                     for (Artist artist : ArtistsList) {
@@ -681,46 +771,73 @@ System.out.println("Track: " + track.getName());
                             break;
                         else {
                             Log.e("test",artist.getName());
+                                LinearLayout artistLayout = new LinearLayout(MainActivity.this);
+                                artistLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                                        LinearLayout.LayoutParams.MATCH_PARENT,
+                                        LinearLayout.LayoutParams.WRAP_CONTENT
+                                ));
+                                artistLayout.setOrientation(LinearLayout.HORIZONTAL);
 
-                            LinearLayout artistLayout = new LinearLayout(MainActivity.this);
-                            artistLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                                    0,
-                                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                                    1));
-                            artistLayout.setOrientation(LinearLayout.VERTICAL);
+                                ImageView artistImage = new ImageView(MainActivity.this);
 
-                            ImageView artistImage = new ImageView(MainActivity.this);
+                            float desiredHeightPercentage = 0.10f;
+                            int parentHeight = getResources().getDisplayMetrics().heightPixels;
+                            int desiredHeight = (int) (parentHeight * desiredHeightPercentage);
+                            int desiredWidth=2*desiredHeight;
+
+
                             artistImage.setLayoutParams(new LinearLayout.LayoutParams(
-                                    LinearLayout.LayoutParams.MATCH_PARENT, // Set image width to match parent
-                                    200));
-                            if (artist.getImages() != null && artist.getImages().length > 0) {
-                                String imageUrl = artist.getImages()[0].getUrl();
+                                    desiredWidth,
+                                    desiredHeight
+                                ));
 
-                                Picasso.get()
-                                        .load(imageUrl)
-                                        .transform(new RoundedCornersTransformation(700, 10))
-                                        .into(artistImage);
+                                if (artist.getImages() != null && artist.getImages().length > 0) {
+                                    String imageUrl = artist.getImages()[0].getUrl();
+                                    Picasso.get()
+                                            .load(imageUrl)
+                                            .transform(new RoundedCornersTransformation(700, 10))
+                                            .into(artistImage);
+                                }
+
+                                TextView artistInfo = new TextView(MainActivity.this);
+                                artistInfo.setLayoutParams(new LinearLayout.LayoutParams(
+                                        LinearLayout.LayoutParams.MATCH_PARENT,
+                                        LinearLayout.LayoutParams.WRAP_CONTENT
+                                ));
+
+                                artistInfo.setText("\n"+i + ". " + artist.getName());
+                                artistInfo.setGravity(Gravity.CENTER);
+                                artistInfo.setTextColor(Color.parseColor("#280057"));
+                                Typeface customTypeface = ResourcesCompat.getFont(MainActivity.this, R.font.font_family);
+                                artistInfo.setTypeface(customTypeface);
+                            int rightMarginPx = 10;
+                            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                                    LinearLayout.LayoutParams.MATCH_PARENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT
+                            );
+
+                            layoutParams.setMargins(0, 0, rightMarginPx, 0);
+
+                            artistInfo.setLayoutParams(layoutParams);
+
+                            artistInfo.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
 
 
-                            }
+                                artistLayout.addView(artistImage);
+                                artistLayout.addView(artistInfo);
 
-                            TextView artistName = new TextView(MainActivity.this);
-                            artistName.setLayoutParams(new LinearLayout.LayoutParams(
-                                    LinearLayout.LayoutParams.MATCH_PARENT, // Set width to match parent
-                                    LinearLayout.LayoutParams.WRAP_CONTENT));
-                            artistName.setText("\n" + String.valueOf(i) + "." + artist.getName());
-                            artistName.setGravity(Gravity.CENTER);
-                            artistName.setTextColor(Color.WHITE);
-                            artistLayout.addView(artistImage);
-                            artistLayout.addView(artistName);
+                                scrollViewContent.addView(artistLayout);
 
-
-                            i = i + 1;
-                            scrollViewContent.addView(artistLayout);
+                                i++;
                         }
                     }
+                    //one blank item for readability
+                    View blankView = new View(MainActivity.this);
+                    blankView.setLayoutParams(new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT, 100));
 
-                    Loaded[2] = true;
+                    scrollViewContent.addView(blankView);
+
                 } else {
                     System.out.println("Error fetching top artists");
                 }
@@ -743,27 +860,37 @@ System.out.println("Track: " + track.getName());
                 else if(toptype==6) {
                     TracksList.addAll(LongTermTracks);
                     TextView TopTextTitle = findViewById(R.id.TopTextTitle);
-                    TopTextTitle.setText("Top artists\nlifetime");
+                    TopTextTitle.setText("Top tracks\nlifetime");
                 }
                 if (TracksList != null) {
                     LinearLayout scrollViewContent = findViewById(R.id.TopPanelLayout);
-
+                    scrollViewContent.removeAllViews();
                     int i = 1;
                     for (Track track : TracksList) {
                         if (i >= TracksList.size())
                             break;
                         else {
+                            Log.e("test",track.getName());
                             LinearLayout artistLayout = new LinearLayout(MainActivity.this);
                             artistLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                                    0,
-                                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                                    1));
-                            artistLayout.setOrientation(LinearLayout.VERTICAL);
+                                    LinearLayout.LayoutParams.MATCH_PARENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT
+                            ));
+                            artistLayout.setOrientation(LinearLayout.HORIZONTAL);
 
                             ImageView artistImage = new ImageView(MainActivity.this);
+
+                            float desiredHeightPercentage = 0.10f;
+                            int parentHeight = getResources().getDisplayMetrics().heightPixels;
+                            int desiredHeight = (int) (parentHeight * desiredHeightPercentage);
+                            int desiredWidth=2*desiredHeight;
+
+
                             artistImage.setLayoutParams(new LinearLayout.LayoutParams(
-                                    LinearLayout.LayoutParams.MATCH_PARENT, // Set image width to match parent
-                                    200));
+                                    desiredWidth,
+                                    desiredHeight
+                            ));
+
 
                             AlbumSimplified album = track.getAlbum();
                             if (album.getImages() != null && album.getImages().length > 0) {
@@ -775,23 +902,44 @@ System.out.println("Track: " + track.getName());
                                         .into(artistImage);
                             }
 
-                            TextView artistName = new TextView(MainActivity.this);
-                            artistName.setLayoutParams(new LinearLayout.LayoutParams(
-                                    LinearLayout.LayoutParams.MATCH_PARENT, // Set width to match parent
-                                    LinearLayout.LayoutParams.WRAP_CONTENT));
-                            artistName.setText("\n" + String.valueOf(i) + "." + track.getName());
-                            artistName.setMaxLines(2);
-                            artistName.setEllipsize(TextUtils.TruncateAt.END);
-                            artistName.setGravity(Gravity.CENTER);
-                            artistName.setTextColor(Color.WHITE);
-                            artistLayout.addView(artistImage);
-                            artistLayout.addView(artistName);
 
-                            i = i + 1;
+                            TextView artistInfo = new TextView(MainActivity.this);
+                            artistInfo.setLayoutParams(new LinearLayout.LayoutParams(
+                                    LinearLayout.LayoutParams.MATCH_PARENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT
+                            ));
+
+                            artistInfo.setText("\n"+i + ". " + track.getName()+"\n"+track.getArtists()[0].getName());
+                            artistInfo.setGravity(Gravity.CENTER);
+                            artistInfo.setTextColor(Color.parseColor("#280057"));
+                            Typeface customTypeface = ResourcesCompat.getFont(MainActivity.this, R.font.font_family);
+                            artistInfo.setTypeface(customTypeface);
+                            int rightMarginPx = 10;
+                            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                                    LinearLayout.LayoutParams.MATCH_PARENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT
+                            );
+
+                            layoutParams.setMargins(0, 0, rightMarginPx, 0);
+
+                            artistInfo.setLayoutParams(layoutParams);
+
+                            artistInfo.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+
+
+                            artistLayout.addView(artistImage);
+                            artistLayout.addView(artistInfo);
+
                             scrollViewContent.addView(artistLayout);
+
+                            i++;
                         }
                     }
-                    Loaded[3] = true;
+                    View blankView = new View(MainActivity.this);
+                    blankView.setLayoutParams(new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT, 100));
+
+                    scrollViewContent.addView(blankView);
                 } else {
                     System.out.println("Error fetching top artists");
                 }
@@ -802,6 +950,118 @@ System.out.println("Track: " + track.getName());
 
         }
     }
+
+
+
+
+    private class LastTracksPageTop extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Log.e("test","STARTED3");
+
+        }
+        @Override
+        protected Void doInBackground(Void... voids) {
+            return null;
+        }
+
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+
+
+                    LinearLayout scrollViewContent = findViewById(R.id.LastTracksPanelLayout);
+                    scrollViewContent.removeAllViews();
+                    int i = 1;
+                    for (Track track : trackArray) {
+                        if (i >= trackArray.length)
+                            break;
+                        else {
+
+                            Log.e("test",track.getName());
+                            LinearLayout artistLayout = new LinearLayout(MainActivity.this);
+                            artistLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                                    LinearLayout.LayoutParams.MATCH_PARENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT
+                            ));
+                            artistLayout.setOrientation(LinearLayout.HORIZONTAL);
+
+                            ImageView artistImage = new ImageView(MainActivity.this);
+
+                            float desiredHeightPercentage = 0.10f;
+                            int parentHeight = getResources().getDisplayMetrics().heightPixels;
+                            int desiredHeight = (int) (parentHeight * desiredHeightPercentage);
+                            int desiredWidth=2*desiredHeight;
+
+
+                            artistImage.setLayoutParams(new LinearLayout.LayoutParams(
+                                    desiredWidth,
+                                    desiredHeight
+                            ));
+
+
+                            AlbumSimplified album = track.getAlbum();
+                            if (album.getImages() != null && album.getImages().length > 0) {
+                                String imageUrl = album.getImages()[0].getUrl();
+
+                                Picasso.get()
+                                        .load(imageUrl)
+                                        .transform(new RoundedCornersTransformation(100, 10))
+                                        .into(artistImage);
+                            }
+
+
+                            TextView artistInfo = new TextView(MainActivity.this);
+                            artistInfo.setLayoutParams(new LinearLayout.LayoutParams(
+                                    LinearLayout.LayoutParams.MATCH_PARENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT
+                            ));
+
+                            artistInfo.setText("\n"+ track.getName()+"\n"+track.getArtists()[0].getName());
+                            artistInfo.setGravity(Gravity.CENTER);
+                            artistInfo.setTextColor(Color.parseColor("#280057"));
+                            Typeface customTypeface = ResourcesCompat.getFont(MainActivity.this, R.font.font_family);
+                            artistInfo.setTypeface(customTypeface);
+                            int rightMarginPx = 10;
+                            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                                    LinearLayout.LayoutParams.MATCH_PARENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT
+                            );
+
+                            layoutParams.setMargins(0, 0, rightMarginPx, 0);
+
+                            artistInfo.setLayoutParams(layoutParams);
+
+                            artistInfo.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+
+
+                            artistLayout.addView(artistImage);
+                            artistLayout.addView(artistInfo);
+
+                            scrollViewContent.addView(artistLayout);
+
+                            i++;
+                        }
+                    }
+                    View blankView = new View(MainActivity.this);
+                    blankView.setLayoutParams(new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT, 100));
+
+                    scrollViewContent.addView(blankView);
+
+            LinearLayout lasttracks = findViewById(R.id.lasttracks);;
+            HideEverythingExcept(lasttracks);
+
+        }
+    }
+
+
+
+
+
 
     public void SpotiAuth(View view)
     {
