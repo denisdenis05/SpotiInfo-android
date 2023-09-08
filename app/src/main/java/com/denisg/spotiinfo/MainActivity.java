@@ -600,10 +600,39 @@ System.out.println("Track: " + track.getName());
             toptype=4;
         }
         new TopPageTop().execute();
-        LinearLayout tops = findViewById(R.id.tops);
-        HideEverythingExcept(tops);
     }
 
+    public void TopButtonsFunction(View view) {
+        int viewId = view.getId();
+        FrameLayout loading = findViewById(R.id.loadingpanel);
+        HideEverythingExcept(loading);
+
+        if (viewId == R.id.SwitchToButton) {
+            if(toptype<4)
+                toptype=toptype+3;
+            else
+                toptype=toptype-3;
+        }
+        else if (viewId == R.id.weeksbutton) {
+            if(toptype<4)
+                toptype=1;
+            else
+                toptype=4;
+        }
+        else if (viewId == R.id.monthsbutton) {
+            if(toptype<4)
+                toptype=2;
+            else
+                toptype=5;
+        }
+        else if (viewId == R.id.lifetimebutton) {
+            if(toptype<4)
+                toptype=3;
+            else
+                toptype=6;
+        }
+        new TopPageTop().execute();
+    }
 
     private class TopPageTop extends AsyncTask<Void, Void, Void> {
 
@@ -626,14 +655,23 @@ System.out.println("Track: " + track.getName());
             if(toptype>=1 && toptype<=3) {
                 //TOP ARTISTS
                 List<Artist> ArtistsList = new ArrayList<>();
-                if(toptype==1)
+                if(toptype==1) {
                     ArtistsList.addAll(ShortTermArtists);
-                else if(toptype==2)
-                    ArtistsList.addAll(MediumTermArtists);
-                else if(toptype==3)
-                    ArtistsList.addAll(LongTermArtists);
+                    TextView TopTextTitle = findViewById(R.id.TopTextTitle);
+                    TopTextTitle.setText("Top artists\nlast 4 weeks");
 
+                }
+                else if(toptype==2) {
+                    ArtistsList.addAll(MediumTermArtists);
+                    TextView TopTextTitle = findViewById(R.id.TopTextTitle);
+                    TopTextTitle.setText("Top artists\nlast 6 months");
+                }else if(toptype==3) {
+                    ArtistsList.addAll(LongTermArtists);
+                    TextView TopTextTitle = findViewById(R.id.TopTextTitle);
+                    TopTextTitle.setText("Top artists\nlifetime");
+                }
                 if (ArtistsList != null) {
+                    Log.e("test","ARTISTS!!!!!!!");
 
                     LinearLayout scrollViewContent = findViewById(R.id.TopPanelLayout);
 
@@ -642,6 +680,8 @@ System.out.println("Track: " + track.getName());
                         if (i >= ArtistsList.size())
                             break;
                         else {
+                            Log.e("test",artist.getName());
+
                             LinearLayout artistLayout = new LinearLayout(MainActivity.this);
                             artistLayout.setLayoutParams(new LinearLayout.LayoutParams(
                                     0,
@@ -690,13 +730,21 @@ System.out.println("Track: " + track.getName());
                 // TOP TRACKS
 
                 List<Track> TracksList = new ArrayList<>();
-                if(toptype==4)
+                if(toptype==4) {
                     TracksList.addAll(ShortTermTracks);
-                else if(toptype==5)
+                    TextView TopTextTitle = findViewById(R.id.TopTextTitle);
+                    TopTextTitle.setText("Top tracks\nlast 4 weeks");
+                }
+                else if(toptype==5) {
                     TracksList.addAll(MediumTermTracks);
-                else if(toptype==6)
+                    TextView TopTextTitle = findViewById(R.id.TopTextTitle);
+                    TopTextTitle.setText("Top tracks\nlast 6 months");
+                }
+                else if(toptype==6) {
                     TracksList.addAll(LongTermTracks);
-
+                    TextView TopTextTitle = findViewById(R.id.TopTextTitle);
+                    TopTextTitle.setText("Top artists\nlifetime");
+                }
                 if (TracksList != null) {
                     LinearLayout scrollViewContent = findViewById(R.id.TopPanelLayout);
 
@@ -748,6 +796,10 @@ System.out.println("Track: " + track.getName());
                     System.out.println("Error fetching top artists");
                 }
             }
+
+            LinearLayout tops = findViewById(R.id.tops);
+            HideEverythingExcept(tops);
+
         }
     }
 

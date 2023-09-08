@@ -50,15 +50,16 @@
             android:layout_marginTop="35dp"
             android:layout_marginRight="25dp"
             android:layout_marginBottom="10dp"
-
             android:autoSizeTextType="uniform"
+
+            android:gravity="center"
             android:text="Top artists"
             android:textColor="#d7ff60"
             android:textSize="24sp" />
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="504dp"
+            android:layout_height="474dp"
             android:layout_margin="25dp"
             android:background="@drawable/allrounded_light_green">
 
@@ -67,8 +68,52 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="25dp"
+                android:background="@android:color/transparent"
                 android:orientation="vertical" />
         </ScrollView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:orientation="horizontal"
+
+            >
+
+            <Button
+                android:id="@+id/weeksbutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="TopButtonsFunction"
+                android:text="4 weeks" />
+
+            <Button
+                android:id="@+id/monthsbutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="TopButtonsFunction"
+                android:text="6 months" />
+
+            <Button
+                android:id="@+id/lifetimebutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="TopButtonsFunction"
+                android:text="lifetime" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/SwitchToButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Switch to tracks"
+            android:onClick="TopButtonsFunction"
+            android:layout_margin="15dp"
+            />
 
     </LinearLayout>
 
@@ -78,7 +123,7 @@
         android:layout_height="match_parent"
         android:background="#1F1F1F"
         android:orientation="vertical"
-        tools:layout_editor_absoluteY="1032dp">
+        tools:layout_editor_absoluteY="725dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -191,6 +236,7 @@
                     android:layout_weight="1"
                     android:autoSizeTextType="uniform"
                     android:background="@android:color/transparent"
+                    android:onClick="MoreTop"
                     android:text="More"
 
                     android:textColor="#FFFFFF" />
@@ -263,8 +309,8 @@
                     android:id="@+id/scrollViewContentRecentTracks"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
                     android:background="@android:color/transparent"
+                    android:orientation="horizontal">
 
 
                     <ImageView
