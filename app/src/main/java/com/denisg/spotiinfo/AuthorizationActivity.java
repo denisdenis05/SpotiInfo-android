@@ -5,8 +5,11 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Window;
+import android.view.WindowManager;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.WindowCompat;
 
 import org.apache.hc.core5.http.ParseException;
 import org.json.JSONException;
@@ -34,6 +37,11 @@ public class AuthorizationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getSupportActionBar().hide();
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        setContentView(R.layout.activity_main);
 
         Uri callbackUri = getIntent().getData();
 
@@ -45,10 +53,7 @@ public class AuthorizationActivity extends AppCompatActivity {
                 exchangeAuthorizationCodeForToken(authorizationCode);
             }
         }
-        finish();
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
+
     }
 
     private void exchangeAuthorizationCodeForToken(String authorizationCode) {
@@ -72,12 +77,16 @@ public class AuthorizationActivity extends AppCompatActivity {
                     String accessToken = credentials.getAccessToken();
                     String refreshToken = credentials.getRefreshToken();
                     int expiresIn = credentials.getExpiresIn();
+                    Log.e("testtoken1", accessToken);
 
                     TokenManager.saveTokenDetailsToFile(getApplicationContext(),accessToken, refreshToken, expiresIn);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
+                finish();
+                Intent intent = new Intent(AuthorizationActivity.this, MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
                 return null;
             }
 

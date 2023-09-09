@@ -57,6 +57,24 @@ public class Animations {
         }
     }
 
+    public static void ForceHideViews(final View viewToFadeIn, final View... viewsToHide) {
+
+
+        for (View view : viewsToHide) {
+            if (view.getVisibility() == View.VISIBLE)
+            {
+                view.setVisibility(View.GONE);
+                view.setElevation(-10f);
+                EnableDisableViews((ViewGroup) view,false);
+            }
+        }
+        viewToFadeIn.setVisibility(View.VISIBLE);
+        viewToFadeIn.setElevation(10f);
+        EnableDisableViews((ViewGroup) viewToFadeIn,true);
+
+
+    }
+
     public static void EnableDisableViews(ViewGroup viewGroup, boolean type) {
         for (int i = 0; i < viewGroup.getChildCount(); i++) {
             View child = viewGroup.getChildAt(i);

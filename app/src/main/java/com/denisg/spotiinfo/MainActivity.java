@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String REDIRECT_URI = ApiConfig.REDIRECT_URI;
     private boolean logged;
     boolean[] Loaded = new boolean[4];
-    private String accessToken = "none";
+    private String accessToken = "none", refreshToken="none";
     private int toptype=0;
 
     List<Artist> ShortTermArtists = new ArrayList<>(),
@@ -99,7 +99,10 @@ public class MainActivity extends AppCompatActivity {
 
     void init()
     {
-    //init blank layouts
+        FrameLayout loadingpanel = findViewById(R.id.loadingpanel);
+        ForceHideEverythingExcept(loadingpanel);
+
+        //init blank layouts
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         int screenHeight = displayMetrics.heightPixels;
         int desiredHeight = (int) (0.08 * screenHeight);
@@ -137,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
 
                 JSONObject tokenDetails = new JSONObject(jsonString.toString());
                 accessToken = tokenDetails.getString("access_token");
+                refreshToken = tokenDetails.getString("refresh_token");
 
                 long expiresIn = tokenDetails.getLong("expires_in");
                 long tokenAcquiredTime = tokenDetails.getLong("token_acquired_time"); // Save the token acquisition time when you first acquire the token
@@ -146,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if (currentTimeMillis < expirationTimeMillis) {
                     // Token is valid
+
                     Log.e("test","STARTED");
 
                     FrameLayout loadingpanel = findViewById(R.id.loadingpanel);
@@ -162,8 +167,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else {
                     Log.e("ceva","TOKEN EXPIRAT");
-                    String refreshToken = tokenDetails.getString("refresh_token");
-                    //refreshAccessToken(refreshToken);
+                    //new refreshAccessToken().execute();
                     //temp
                     File pd = getApplicationContext().getFilesDir();
 
@@ -197,6 +201,49 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public class refreshAccessToken extends AsyncTask<Void, Void, Void> {
+
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            SpotifyApi spotifyApi = new SpotifyApi.Builder()
+                    .setClientId(CLIENT_ID)
+                    .setClientSecret(CLIENT_SECRET)
+                    .setRefreshToken(refreshToken) // Use the stored refresh token
+                    .build();
+
+            AuthorizationCodeRefreshRequest refreshRequest = spotifyApi.authorizationCodeRefresh()
+                    .build();
+
+            AuthorizationCodeCredentials refreshedCredentials = null;
+            try {
+                refreshedCredentials = refreshRequest.execute();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (SpotifyWebApiException e) {
+                e.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            String newAccessToken = refreshedCredentials.getAccessToken();
+            String newRefreshToken = refreshedCredentials.getRefreshToken(); // It might not always change
+            int newExpiresIn = refreshedCredentials.getExpiresIn();
+            Log.e("testtoken2", newAccessToken);
+
+            // Update the saved token details with the new access token and expiration time
+            TokenManager.saveTokenDetailsToFile(getApplicationContext(), newAccessToken, newRefreshToken, newExpiresIn);
+            finish();
+            Intent intent = new Intent(MainActivity.this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+
+            return null;
+        }
+    }
+
+
+
     public class startloading extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -209,7 +256,6 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            Log.e("test","DOINBACKGROUNDSTARTED2");
 
             while(loaded()==false) {
                 try {
@@ -218,7 +264,7 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
-                return null;
+            return null;
         }
 
         boolean loaded()
@@ -250,31 +296,16 @@ public class MainActivity extends AppCompatActivity {
         Animations.FadeInOutViews(view, auth, mainpanel, tops,lasttracks, loading);
     }
 
-    private void refreshAccessToken(String refreshToken) {
-    SpotifyApi spotifyApi = new SpotifyApi.Builder()
-            .setClientId(CLIENT_ID)
-            .setClientSecret(CLIENT_SECRET)
-            .build();
-
-    AuthorizationCodeRefreshRequest refreshRequest = spotifyApi.authorizationCodeRefresh()
-            .refresh_token(refreshToken)
-            .build();
-
-    try {
-        AuthorizationCodeCredentials refreshedCredentials = refreshRequest.execute();
-
-        String newAccessToken = refreshedCredentials.getAccessToken();
-        int newExpiresIn = refreshedCredentials.getExpiresIn();
-
-        // Update the saved token details with the new access token and expiration time
-        TokenManager.saveTokenDetailsToFile(this,newAccessToken, refreshToken, newExpiresIn);
-        accessToken = newAccessToken;
-
-
-    } catch (IOException | SpotifyWebApiException | ParseException e) {
-        e.printStackTrace();
+    void ForceHideEverythingExcept(View view)
+    {
+        LinearLayout auth = findViewById(R.id.authpanel);
+        LinearLayout mainpanel = findViewById(R.id.mainpanel);
+        LinearLayout tops = findViewById(R.id.tops);
+        LinearLayout lasttracks = findViewById(R.id.lasttracks);
+        FrameLayout loading = findViewById(R.id.loadingpanel);
+        Animations.ForceHideViews(view, auth, mainpanel, tops,lasttracks, loading);
     }
-}
+
 
     private class LoadTop extends AsyncTask<Void, Void, Void> {
 
